@@ -93,7 +93,7 @@ class ConfigManager {
     // 檢查必要欄位
     if (schema.required) {
       for (const field of schema.required) {
-        if (!config.hasOwnProperty(field)) {
+        if (!Object.prototype.hasOwnProperty.call(config, field)) {
           errors.push(`  - 缺少必要欄位: ${field}`);
         } else if (this.isEmpty(config[field])) {
           errors.push(`  - 欄位 ${field} 不可為空值`);
