@@ -39,7 +39,7 @@ function filterSensitiveInfo(message) {
       if (sensitiveValue && typeof sensitiveValue === 'string') {
         const beforeSensitive = match.substring(0, match.indexOf(sensitiveValue));
         
-        if (sensitiveValue.length <= 6) {
+        if (sensitiveValue.length <= MIN_MASK_LENGTH) {
           return beforeSensitive + '*'.repeat(sensitiveValue.length);
         }
         const visiblePart = sensitiveValue.substring(0, 3);
