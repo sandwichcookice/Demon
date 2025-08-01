@@ -9,6 +9,59 @@ let globalLogPath = null;              // 本次啟動的 log 資料夾
 let UseConsoleLog = false;              // 是否使用 console.log 輸出
 const streamMap = new Map();           // 儲存每個 log 檔案名稱對應的 writeStream
 
+const MIN_MASK_LENGTH = 6;             // 敏感資訊最小遮罩長度
+
+// 敏感資訊過濾規則
+const SENSITIVE_PATTERNS = [
+  /token["\s]*[:=]["\s]*([a-zA-Z0-9._-]+)/gi,           // Token patterns
+  /api[_-]?key["\s]*[:=]["\s]*([a-zA-Z0-9._-]+)/gi,    // API key patterns  
+  /password["\s]*[:=]["\s]*([^\s"]+)/gi,                // Password patterns
+  /secret["\s]*[:=]["\s]*([a-zA-Z0-9._-]+)/gi,          // Secret patterns
+  /authorization["\s]*:["\s]*([a-zA-Z0-9._-]+)/gi,      // Authorization headers
+  /bearer\s+([a-zA-Z0-9._-]+)/gi,                       // Bearer tokens
+  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, // Email addresses
+  /\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g,     // Credit card numbers
+];
+
+/**
+ * 過濾敏感資訊
+ * @param {string} message - 原始訊息
+ * @returns {string} - 過濾後的訊息
+ */
+function filterSensitiveInfo(message) {
+  if (typeof message !== 'string') {
+    message = String(message);
+  }
+  
+  let filteredMessage = message;
+  
+  SENSITIVE_PATTERNS.forEach(pattern => {
+    filteredMessage = filteredMessage.replace(pattern, (match, sensitiveValue) => {
+      // 如果有捕獲組，只過濾捕獲的部分
+      if (sensitiveValue && typeof sensitiveValue === 'string') {
+        const beforeSensitive = match.substring(0, match.indexOf(sensitiveValue));
+        
+        if (sensitiveValue.length <= MIN_MASK_LENGTH) {
+          return beforeSensitive + '*'.repeat(sensitiveValue.length);
+        }
+        const visiblePart = sensitiveValue.substring(0, 3);
+        const hiddenPart = '*'.repeat(sensitiveValue.length - 3);
+        return beforeSensitive + visiblePart + hiddenPart;
+      } else {
+        // 沒有捕獲組的情況（如email和信用卡）
+        if (match.length <= 6) {
+          return '*'.repeat(match.length);
+        }
+        const visiblePart = match.substring(0, 3);  
+        const hiddenPart = '*'.repeat(match.length - 3);
+        return visiblePart + hiddenPart;
+      }
+    });
+  });
+  
+  return filteredMessage;
+}
+
 /**
  * Logger 類別，支援多檔案記錄
  */
@@ -78,13 +131,16 @@ class Logger {
    */
   format(level, message) {
     const timestamp = new Date().toISOString();
-    return `${timestamp} - ${level.toUpperCase()} - ${message}`;
+    // 過濾敏感資訊
+    const filteredMessage = filterSensitiveInfo(message);
+    return `${timestamp} - ${level.toUpperCase()} - ${filteredMessage}`;
   }
 
   Original(msg) {
-    // 原始訊息輸出，無格式化
-    this.logStream.write(`${new Date().toISOString()} - ORIGINAL - ${msg}\n`);
-    if(UseConsoleLog) console.log(msg);
+    // 原始訊息輸出，過濾敏感資訊
+    const filteredMsg = filterSensitiveInfo(String(msg));
+    this.logStream.write(`${new Date().toISOString()} - ORIGINAL - ${filteredMsg}\n`);
+    if(UseConsoleLog) console.log(filteredMsg);
   }
 
   /**
@@ -125,6 +181,31 @@ class Logger {
     return globalLogPath;
   }
 
+  /**
+   * 記錄原始訊息（不進行敏感資訊過濾）
+   * 僅供調試使用，請謹慎使用
+   * @param {string} level - 日誌級別
+   * @param {string} msg - 訊息內容
+   */
+  logRaw(level, msg) {
+    const timestamp = new Date().toISOString();
+    const line = `${timestamp} - ${level.toUpperCase()} - RAW - ${msg}`;
+    this.logStream.write(line + '\n');
+    if(UseConsoleLog) console.log(`[RAW] ${msg}`);
+  }
+
+  /**
+   * 檢查訊息是否包含敏感資訊
+   * @param {string} message - 要檢查的訊息
+   * @returns {boolean} - 是否包含敏感資訊
+   */
+  static hasSensitiveInfo(message) {
+    if (typeof message !== 'string') {
+      message = String(message);
+    }
+    return SENSITIVE_PATTERNS.some(pattern => pattern.test(message));
+  }
+
 }
 
 /**
@@ -145,3 +226,4 @@ module.exports.SetLoggerBasePath = SetLoggerBasePath;
 module.exports.SetConsoleLog = (bool) => {
   UseConsoleLog = bool;
 }
+module.exports.filterSensitiveInfo = filterSensitiveInfo;
