@@ -1,13 +1,13 @@
 const axios = require('axios');
 jest.mock('axios');
 
-const OsInfor = require('../src/tools/OsInfor');
+const OsInfor = require('../../src/tools/OsInfor');
 jest.mock('../src/tools/OsInfor');
 
-const tts = require('../src/plugins/tts');
-const remote = require('../src/plugins/tts/strategies/remote');
-const server = require('../src/plugins/tts/strategies/server');
-const local = require('../src/plugins/tts/strategies/local');
+const tts = require('../../src/plugins/tts');
+const remote = require('../../src/plugins/tts/strategies/remote');
+const server = require('../../src/plugins/tts/strategies/server');
+const local = require('../../src/plugins/tts/strategies/local');
 
 describe('TTS updateStrategy 自動判定', () => {
   beforeEach(() => {

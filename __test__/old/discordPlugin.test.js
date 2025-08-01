@@ -29,8 +29,8 @@ jest.mock('../src/plugins/discord/config', () => ({
   userId: 'cookice'
 }), { virtual: true });
 
-const discordLocal = require('../src/plugins/discord/strategies/local');
-const discordPlugin = require('../src/plugins/discord');
+const discordLocal = require('../../src/plugins/discord/strategies/local');
+const discordPlugin = require('../../src/plugins/discord');
 
 describe('Discord 本地策略', () => {
   beforeEach(async () => {

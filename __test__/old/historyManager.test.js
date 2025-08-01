@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const historyManager = require('../src/core/historyManager');
+const historyManager = require('../../src/core/historyManager');
 
 const userId = 'jestUser';
 const filePath = path.resolve(__dirname, '..', 'history', `${userId}.json`);

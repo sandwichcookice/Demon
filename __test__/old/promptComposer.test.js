@@ -1,4 +1,4 @@
-const composer = require('../src/core/PromptComposer');
+const composer = require('../../src/core/PromptComposer');
 
 describe('createToolMessage', () => {
   test('成功組合結果訊息', async () => {

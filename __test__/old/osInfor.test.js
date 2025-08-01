@@ -1,5 +1,5 @@
 const os = require('os');
-const OsInfor = require('../src/tools/OsInfor');
+const OsInfor = require('../../src/tools/OsInfor');
 
 describe('OsInfor 工具', () => {
   test('table 應回傳完整資訊', async () => {

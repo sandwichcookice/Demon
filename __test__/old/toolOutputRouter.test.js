@@ -1,5 +1,5 @@
-const PM = require('../src/core/pluginsManager');
-const router = require('../src/core/toolOutputRouter');
+const PM = require('../../src/core/pluginsManager');
+const router = require('../../src/core/toolOutputRouter');
 
 describe('toolOutputRouter', () => {
   beforeAll(() => {
