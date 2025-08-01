@@ -9,6 +9,8 @@ let globalLogPath = null;              // 本次啟動的 log 資料夾
 let UseConsoleLog = false;              // 是否使用 console.log 輸出
 const streamMap = new Map();           // 儲存每個 log 檔案名稱對應的 writeStream
 
+const MIN_MASK_LENGTH = 6;             // 敏感資訊最小遮罩長度
+
 // 敏感資訊過濾規則
 const SENSITIVE_PATTERNS = [
   /token["\s]*[:=]["\s]*([a-zA-Z0-9._-]+)/gi,           // Token patterns

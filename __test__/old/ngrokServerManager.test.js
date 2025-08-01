@@ -1,4 +1,4 @@
-const NgrokServerManager = require('../Server/ngrok/ngrokServer');
+const NgrokServerManager = require('../../Server/ngrok/ngrokServer');
 
 // Mock child_process and express to avoid actual startup
 jest.mock('child_process', () => ({

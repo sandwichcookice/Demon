@@ -26,21 +26,21 @@ describe('Logger 敏感資訊過濾', () => {
   test('應該過濾 Token 資訊', () => {
     const message = 'API Token: abc123def456ghi789';
     const filtered = Logger.filterSensitiveInfo(message);
-    expect(filtered).toContain('API***');
+    expect(filtered).toContain('API Token: abc***************');
     expect(filtered).not.toContain('abc123def456ghi789');
   });
 
   test('應該過濾 API Key 資訊', () => {
     const message = 'api_key=sk-1234567890abcdef';
     const filtered = Logger.filterSensitiveInfo(message);
-    expect(filtered).toContain('api***');
+    expect(filtered).toContain('api_key=sk-***************');
     expect(filtered).not.toContain('sk-1234567890abcdef');
   });
 
   test('應該過濾密碼資訊', () => {
     const message = 'password: mySecretPassword123';
     const filtered = Logger.filterSensitiveInfo(message);
-    expect(filtered).toContain('pas***');
+    expect(filtered).toContain('password: myS****************');
     expect(filtered).not.toContain('mySecretPassword123');
   });
 
