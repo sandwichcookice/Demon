@@ -225,7 +225,7 @@ class HistoryManager {
    * 獲取歷史管理器統計資訊
    * @returns {object} 統計資訊
    */
-  getStats() {
+  async getStats() {
     const stats = {
       config: this.config,
       cacheSize: this.cache.size,
